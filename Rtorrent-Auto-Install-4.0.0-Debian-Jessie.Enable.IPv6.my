@@ -707,7 +707,7 @@ function SELECT_PLUGINS {
 # Function for installing dependencies
 function APT_DEPENDENCIES {
 	apt-get update
-	apt-get install openssl git apache2 apache2-utils build-essential libsigc++-2.0-dev \
+	apt-get -y install openssl git apache2 apache2-utils build-essential libsigc++-2.0-dev \
 	libcurl4-openssl-dev automake libtool libcppunit-dev libncurses5-dev libapache2-mod-scgi \
 	php5 php5-curl php5-cli libapache2-mod-php5 tmux unzip libssl-dev curl
 }
@@ -725,6 +725,7 @@ function INSTALL_RTORRENT {
 	./configure --disable-cplusplus
 	make
 	make install
+	read -p " xmlrpc-c installed. Press any key to continue..." -n 1
 
 	cd ..
 	rm -rv xmlrpc*
@@ -742,6 +743,7 @@ function INSTALL_RTORRENT {
 	./configure
 	make
 	make install
+	read -p " libtorrent installed. Press any key to continue..." -n 1
 
 	cd ..
 
@@ -755,6 +757,7 @@ function INSTALL_RTORRENT {
 	./configure --with-xmlrpc-c --enable-ipv6
 	make
 	make install
+	read -p " rtorrent installed. Press any key to continue..." -n 1
 
 	cd ../..
 	rm -rv rtorrent
