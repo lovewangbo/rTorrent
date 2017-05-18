@@ -792,13 +792,16 @@ function INSTALL_RUTORRENT {
   curl -L http://dl.bintray.com/novik65/generic/ruTorrent-3.7.zip -o ruTorrent-3.7.zip
   unzip ruTorrent-3.7.zip -d ruTorrent-3.7
 
+	if [ -d /var/www/html/rutorrent.old ]; then
+		rm -r /var/www/html/rutorrent.old
+	fi
 	if [ -d /var/www/html/rutorrent ]; then
-		rm -r /var/www/html/rutorrent
+#		rm -r /var/www/html/rutorrent
+		mv /var/www/html/rutorrent /var/www/html/rutorrent.old
 	fi
 
 #	mv -f rutorrent /var/www/html/
 #	rm -v rutorrent-3.6.tar.gz
-	mv /var/www/html/rutorrent /var/www/html/rutorrent.old
 	mv ruTorrent-3.7/ruTorrent-master rutorrent
 	mv rutorrent /var/www/html/
 	rm -v ruTorrent-3.7.zip
