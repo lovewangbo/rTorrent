@@ -1,12 +1,8 @@
 #!/bin/bash
 # PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
+# Stop when errors, do not place before #!/bin/bash
 set -e
 clear
-
-log_file="HOME"/log."$TODAY"
-exec 1>>$log_file
-
-export TMPDIR=/home/yellow/tmp
 
 # Formatting variables
 BOLD=$(tput bold)
