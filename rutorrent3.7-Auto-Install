@@ -796,14 +796,14 @@ function INSTALL_RUTORRENT {
 		rm -r /var/www/html/rutorrent
 	fi
 
-	# Changeing SCGI mount point in rutorrent config.
-	sed -i "s/\/RPC2/\/rutorrent\/RPC2/g" ./rutorrent/conf/config.php
-
 #	mv -f rutorrent /var/www/html/
 #	rm -v rutorrent-3.6.tar.gz
-  mv /var/www/html/rutorrent /var/www/html/rutorrent.old
-  mv ruTorrent-3.7/ruTorrent-master /var/www/html/rutorrent
-  rm -v ruTorrent-3.7.zip
+	mv /var/www/html/rutorrent /var/www/html/rutorrent.old
+	mv ruTorrent-3.7/ruTorrent-master /var/www/html/rutorrent
+	rm -v ruTorrent-3.7.zip
+
+	# Changeing SCGI mount point in rutorrent config.
+	sed -i "s/\/RPC2/\/rutorrent\/RPC2/g" ./rutorrent/conf/config.php
 
 	if [ -d "$TEMP_PLUGIN_DIR" ]; then
 		mv -fv "$TEMP_PLUGIN_DIR"/* /var/www/html/rutorrent/plugins
