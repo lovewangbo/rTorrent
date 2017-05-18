@@ -3,6 +3,11 @@
 set -e
 clear
 
+log_file="HOME"/log."$TODAY"
+exec 1>>$log_file
+
+export TMPDIR=/home/yellow/tmp
+
 # Formatting variables
 BOLD=$(tput bold)
 NORMAL=$(tput sgr0)
