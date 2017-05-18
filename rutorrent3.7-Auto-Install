@@ -801,7 +801,7 @@ function INSTALL_RUTORRENT {
 	mv /var/www/html/rutorrent /var/www/html/rutorrent.old
 	mv ruTorrent-3.7/ruTorrent-master rutorrent
 	mv rutorrent /var/www/html/
-	rm -v ruTorrent-3.7.ziprm
+	rm -v ruTorrent-3.7.zip
 
 	# Changeing SCGI mount point in rutorrent config.
 	sed -i "s/\/RPC2/\/rutorrent\/RPC2/g" ./rutorrent/conf/config.php
