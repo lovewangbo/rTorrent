@@ -1,7 +1,7 @@
-set -e
-
 #!/bin/bash
 # PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
+# Issue errors to prevent from continue. Do not place before "#!/bin/bash"
+set -e
 clear
 
 # Formatting variables
@@ -727,6 +727,7 @@ function INSTALL_RTORRENT {
 	./configure --disable-cplusplus
 	make
 	make install
+	make clean
 
 	cd ..
 	rm -rv xmlrpc*
@@ -744,6 +745,7 @@ function INSTALL_RTORRENT {
 	./configure
 	make
 	make install
+	make clean
 
 	cd ..
 
@@ -757,6 +759,7 @@ function INSTALL_RTORRENT {
 	./configure --with-xmlrpc-c --enable-ipv6
 	make
 	make install
+	make clean
 
 	cd ../..
 	rm -rv rtorrent
