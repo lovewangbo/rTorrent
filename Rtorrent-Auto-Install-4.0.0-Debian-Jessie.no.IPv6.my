@@ -731,6 +731,7 @@ function INSTALL_RTORRENT {
 	./configure --disable-cplusplus
 	make
 	make install
+	make clean
 
 	cd ..
 	rm -rv xmlrpc*
@@ -746,6 +747,7 @@ function INSTALL_RTORRENT {
 	./configure
 	make
 	make install
+	make clean
 
 	cd ..
 
@@ -757,6 +759,7 @@ function INSTALL_RTORRENT {
 	./configure --with-xmlrpc-c
 	make
 	make install
+	make clean
 
 	cd ../..
 	rm -rv rtorrent
