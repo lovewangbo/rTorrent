@@ -1,3 +1,5 @@
+set -e
+
 #!/bin/bash
 # PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
 clear
@@ -725,7 +727,6 @@ function INSTALL_RTORRENT {
 	./configure --disable-cplusplus
 	make
 	make install
-	read -p " xmlrpc-c installed. Press any key to continue..." -n 1
 
 	cd ..
 	rm -rv xmlrpc*
@@ -743,7 +744,6 @@ function INSTALL_RTORRENT {
 	./configure
 	make
 	make install
-	read -p " libtorrent installed. Press any key to continue..." -n 1
 
 	cd ..
 
@@ -757,7 +757,6 @@ function INSTALL_RTORRENT {
 	./configure --with-xmlrpc-c --enable-ipv6
 	make
 	make install
-	read -p " rtorrent installed. Press any key to continue..." -n 1
 
 	cd ../..
 	rm -rv rtorrent
