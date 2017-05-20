@@ -795,9 +795,9 @@ function INSTALL_RUTORRENT {
 #	curl -L http://dl.bintray.com/novik65/generic/ruTorrent-3.7.zip -o ruTorrent-3.7.zip
 #	unzip ruTorrent-3.7.zip -d ruTorrent-3.7
 
-	git clone https://github.com/rakshasa/libtorrent.git
-  git clone https://github.com/Novik/ruTorrent.git
-	cd ruTorrent
+	git clone https://github.com/Novik/ruTorrent.git
+	mv ruTorrent rutorrent
+	cd rutorrent
   
 	if [ -d /var/www/html/rutorrent.old ]; then
 		rm -r /var/www/html/rutorrent.old
@@ -814,7 +814,7 @@ function INSTALL_RUTORRENT {
 	mv -f rutorrent /var/www/html/
 #	rm -v rutorrent-3.6.tar.gz
 #	rm -v ruTorrent-3.7.zip
-  rm -rv rtorrent
+	rm -rv rtorrent
 
 	if [ -d "$TEMP_PLUGIN_DIR" ]; then
 		mv -fv "$TEMP_PLUGIN_DIR"/* /var/www/html/rutorrent/plugins
