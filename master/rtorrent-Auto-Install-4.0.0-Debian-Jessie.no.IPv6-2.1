@@ -48,7 +48,7 @@ function APACHE_UTILS {
 	CURL_CHECK="$(dpkg-query -W -f='${Status}' curl 2>/dev/null | grep -c "ok installed")"
 	set -e
 
-	if [ "$AP_UT_CHECK" -ne 1 ] || [ "$UNZIP_CHECK" -ne 1 ] || [ "CURL_CHECK" -ne 1 ]; then
+	if [ "$AP_UT_CHECK" -ne 1 ] || [ "$UNZIP_CHECK" -ne 1 ] || [ "$CURL_CHECK" -ne 1 ]; then
 		echo " One or more of the packages apache2-utils, unzip or curl is not installed and is needed for the setup."
 		read -p " Do you want to install it? [y/n] " -n 1
 		if [[ $REPLY =~ [Yy]$ ]]; then
