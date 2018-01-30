@@ -114,7 +114,6 @@ function HEADER {
 function APT_DEPENDENCIES {
 	apt-get update
 	apt-get install git curl tmux
-	apt-get install libncurses5-dev 
 	# apt-get install openssl apache2 apache2-utils build-essential libsigc++-2.0-dev \
 	# libcurl4-openssl-dev automake libtool libcppunit-dev libapache2-mod-scgi \
 	# php5 php5-curl php5-cli libapache2-mod-php5 unzip libssl-dev
@@ -135,7 +134,6 @@ function INSTALL_RTORRENT {
 	make clean
 
 	sudo apt-get update
-	sudo apt-get install libncurses5-dev libcurl4-openssl-dev
 	./configure --with-xmlrpc-c --enable-ipv6
 	cd ..
 	git clone https://github.com/rakshasa/libtorrent.git
@@ -154,6 +152,9 @@ function INSTALL_RTORRENT {
 	make clean && make -j$(nproc);
 	sudo make install
 	make clean
+
+	# 各软件的依赖组件未作区分，故放在最后，俟后进行调整
+	sudo apt-get install libncurses5-dev libcurl4-openssl-dev
 
 	# whereis  rtorrent
 	# ldd /usr/local/bin/rtorrent 
