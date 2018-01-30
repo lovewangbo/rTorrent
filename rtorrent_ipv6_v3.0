@@ -1,0 +1,290 @@
+#!/bin/bash
+# PLEASE DO NOT SET ANY OF THE VARIABLES, THEY WILL BE POPULATED IN THE MENU
+# Stop when errors, do not place before #!/bin/bash
+set -e
+clear
+
+# Formatting variables
+BOLD=$(tput bold)
+NORMAL=$(tput sgr0)
+GREEN=$(tput setaf 2)
+LBLUE=$(tput setaf 6)
+RED=$(tput setaf 1)
+PURPLE=$(tput setaf 5)
+
+# The system user rtorrent is going to run as
+RTORRENT_USER=""
+
+# The user that is going to log into rutorrent (htaccess)
+WEB_USER=""
+
+# Array with webusers including their hashed paswords
+WEB_USER_ARRAY=()
+
+#rTorrent users home dir.
+HOMEDIR=""
+
+# Function to check if running user is root
+function CHECK_ROOT {
+	if [ "$(id -u)" != "0" ]; then
+		echo
+		echo "This script must be run as root." 1>&2
+		echo
+		exit 1
+	fi
+}
+
+# License
+function LICENSE {
+	clear
+	echo "${BOLD}--------------------------------------------------------------------------------"
+	echo " THE BEER-WARE LICENSE (Revision 42):"
+	echo " <patrick@kerwood.dk> wrote this script. As long as you retain this notice you"
+	echo " can do whatever you want with this stuff. If we meet some day, and you think"
+	echo " this stuff is worth it, you can buy me a beer in return."
+	echo
+	echo " - ${LBLUE}Patrick Kerwood @ LinuxBloggen.dk${NORMAL}"
+	echo "${BOLD}--------------------------------------------------------------------------------${NORMAL}"
+	echo
+	read -p " Press any key to continue..." -n 1
+	echo
+}
+
+# Function to set the system user, rtorrent is going to run as
+function SET_RTORRENT_USER {
+	con=0
+	while [ $con -eq 0 ]; do
+		echo -n "Please type a valid system user: "
+		read RTORRENT_USER
+
+		if [[ -z $(cat /etc/passwd | grep "^$RTORRENT_USER:") ]]; then
+			echo
+			echo "This user does not exist!"
+		elif [[ $(cat /etc/passwd | grep "^$RTORRENT_USER:" | cut -d: -f3) -lt 999 ]]; then
+			echo
+			echo "That user's UID is too low!"
+		elif [[ $RTORRENT_USER == nobody ]]; then
+			echo
+			echo "You cant use 'nobody' as user!"
+		else
+			HOMEDIR=$(cat /etc/passwd | grep "$RTORRENT_USER": | cut -d: -f6)
+			con=1
+		fi
+	done
+}
+
+# Function to  create users for the webinterface
+function SET_WEB_USER {
+	while true; do
+		echo -n "Please type the username for the webinterface, system user not required: "
+		read WEB_USER
+		USER=$(htpasswd -n $WEB_USER 2>/dev/null)
+		if [ $? = 0 ]; then
+			WEB_USER_ARRAY+=($USER)
+			break
+		else
+			echo
+			echo "${RED}Something went wrong!"
+			echo "You have entered an unusable username and/or different passwords.${NORMAL}"
+			echo
+		fi
+	done
+}
+
+# Function to list WebUI users in the menu
+function LIST_WEB_USERS {
+	for i in ${WEB_USER_ARRAY[@]}; do
+		USER_CUT=$(echo $i | cut -d \: -f 1)
+		echo -n " $USER_CUT"
+	done
+}
+
+# Header for the menu
+function HEADER {
+	read -p " Press any key to continue..." -n 1
+	clear
+	echo "${BOLD}--------------------------------------------------------------------------------"
+	echo "                       Rtorrent + Rutorrent Auto Install"
+	echo "                       ${LBLUE}Patrick Kerwood @ LinuxBloggen.dk${NORMAL}"
+	echo "${BOLD}--------------------------------------------------------------------------------${NORMAL}"
+	echo
+}
+
+# Function for installing dependencies
+function APT_DEPENDENCIES {
+	apt-get update
+	apt-get install git curl tmux
+	apt-get install libncurses5-dev 
+	# apt-get install openssl apache2 apache2-utils build-essential libsigc++-2.0-dev \
+	# libcurl4-openssl-dev automake libtool libcppunit-dev libapache2-mod-scgi \
+	# php5 php5-curl php5-cli libapache2-mod-php5 unzip libssl-dev
+}
+
+# Function for setting up xmlrpc, libtorrent and rtorrent
+function INSTALL_RTORRENT {
+	# Use the temp folder for compiling
+	cd ~/tmp
+
+	curl -L http://sourceforge.net/projects/xmlrpc-c/files/Xmlrpc-c%20Super%20Stable/1.33.18/xmlrpc-c-1.33.18.tgz/download -o xmlrpc-c.tgz
+	tar zxvf xmlrpc-c.tgz
+	mv xmlrpc-c-1.* xmlrpc
+	cd xmlrpc/
+	./configure --disable-cplusplus
+	make clean && make -j$(nproc);
+	sudo make install
+	make clean
+
+	sudo apt-get update
+	sudo apt-get install libncurses5-dev libcurl4-openssl-dev
+	./configure --with-xmlrpc-c --enable-ipv6
+	cd ..
+	git clone https://github.com/rakshasa/libtorrent.git
+	cd libtorrent
+	./autogen.sh 
+	./configure 
+	make clean && make -j$(nproc);
+	sudo make install
+	make clean
+
+	git clone https://github.com/rakshasa/rtorrent.git
+	cd rtorrent/
+	./autogen.sh
+	./configure --with-xmlrpc-c --enable-ipv6
+	./configure --with-xmlrpc-c --enable-ipv6
+	make clean && make -j$(nproc);
+	sudo make install
+	make clean
+
+	# whereis  rtorrent
+	# ldd /usr/local/bin/rtorrent 
+	# sudo nano /etc/ld.so.conf
+	# sudo ldconfig
+	# ldd /usr/local/bin/rtorrent
+
+	# Creating session directory
+	if [ ! -d "$HOMEDIR"/.rtorrent-session ]; then
+		mkdir "$HOMEDIR"/.rtorrent-session
+		chown "$RTORRENT_USER"."$RTORRENT_USER" "$HOMEDIR"/.rtorrent-session
+	else
+		chown "$RTORRENT_USER"."$RTORRENT_USER" "$HOMEDIR"/.rtorrent-session
+	fi
+
+	# Creating downloads folder
+	if [ ! -d "$HOMEDIR"/Downloads ]; then
+		mkdir "$HOMEDIR"/Downloads
+		chown "$RTORRENT_USER"."$RTORRENT_USER" "$HOMEDIR"/Downloads
+	else
+		chown "$RTORRENT_USER"."$RTORRENT_USER" "$HOMEDIR"/Downloads
+	fi
+
+	# Downloading rtorrent.rc file.
+	wget -O $HOMEDIR/.rtorrent.rc https://raw.githubusercontent.com/lovewangbo/rTorrent/master/.rtorrent.rc;
+	chown "$RTORRENT_USER"."$RTORRENT_USER" $HOMEDIR/.rtorrent.rc
+	sed -i "s@HOMEDIRHERE@$HOMEDIR@g" $HOMEDIR/.rtorrent.rc
+}
+
+
+# Function for showing the end result when install is complete
+function INSTALL_COMPLETE {
+	rm -rf $TEMP_PLUGIN_DIR
+
+	HEADER
+
+	echo "${GREEN}Installation is complete.${NORMAL}"
+	echo
+	echo
+	echo "${RED}Your default Apache2 vhost file has been disabled and replaced with a new one.${NORMAL}"
+	echo "${RED}If you were using it, combine the default and rutorrent vhost file and enable it again.${NORMAL}"
+	echo
+	echo "${PURPLE}Your downloads folder is in ${LBLUE}$HOMEDIR/Downloads${NORMAL}"
+	echo "${PURPLE}Sessions data is ${LBLUE}$HOMEDIR/.rtorrent-session${NORMAL}"
+	echo "${PURPLE}rtorrent's configuration file is ${LBLUE}$HOMEDIR/.rtorrent.rc${NORMAL}"
+	echo
+	echo "${PURPLE}If you want to change settings for rtorrent, such as download folder, etc.,"
+	echo "you need to edit the '.rtorrent.rc' file. E.g. 'nano $HOMEDIR/.rtorrent.rc'${NORMAL}"
+	echo
+	echo "Rtorrent can be started without rebooting with 'sudo systemctl start rtorrent.service'."
+
+	# The IPv6 local address, is not very used for now, anyway if needed, just change 'inet' to 'inet6'
+	lcl=$(ip addr | grep 'inet ' | awk '{print $2}' | cut -d/ -f1 | grep -v "127." | head -n 1)
+	ext=$(curl -s http://icanhazip.com)
+
+	if [[ ! -z "$lcl" ]] && [[ ! -z "$ext" ]]; then
+		echo "${LBLUE}LOCAL IP:${NORMAL} http://$lcl/rutorrent"
+		echo "${LBLUE}EXTERNAL IP:${NORMAL} http://$ext/rutorrent"
+		echo
+		echo "Visit rutorrent through the above address."
+		echo 
+	else
+		if [[ -z "$lcl" ]]; then
+			echo "Can't detect the local IP address"
+			echo "Try visit rutorrent at http://127.0.0.1/rutorrent"
+			echo 
+		elif [[ -z "$ext" ]]; then
+			echo "${LBLUE}LOCAL:${NORMAL} http://$lcl/rutorrent"
+			echo "Visit rutorrent through your local network"
+		else
+			echo "Can't detect the IP address"
+			echo "Try visit rutorrent at http://127.0.0.1/rutorrent"
+			echo 
+		fi
+	fi
+}
+
+CHECK_ROOT
+LICENSE
+HEADER
+SET_RTORRENT_USER
+SET_WEB_USER
+
+# NOTICE: Change lib, rtorrent, rutorrent versions on upgrades.
+while true; do
+	HEADER
+	echo " ${BOLD}rTorrent version:${NORMAL} ${RED}0.9.4${NORMAL}"
+	echo " ${BOLD}libTorrent version:${NORMAL} ${RED}0.13.4${NORMAL}"
+	echo " ${BOLD}ruTorrent version:${NORMAL} ${RED}3.6${NORMAL}"
+	echo
+	echo " ${BOLD}rTorrent user:${NORMAL}${GREEN} $RTORRENT_USER${NORMAL}"
+	echo
+	echo -n " ${BOLD}ruTorrent user(s):${NORMAL}${GREEN}"
+	LIST_WEB_USERS
+	echo
+	echo
+	echo " ${NORMAL}${BOLD}ruTorrent plugins:${NORMAL}${GREEN}"
+	LIST_PLUGINS
+	echo
+	echo " ${NORMAL}[1] - Change rTorrent user"
+	echo " [2] - Add another ruTorrent user"
+	echo " [3] - Download plugins"
+	echo
+	echo " [0] - Start installation"
+	echo " [q] - Quit"
+	echo
+	echo -n "${GREEN}>>${NORMAL} "
+	read case
+
+	case "$case" in
+		1)
+			SET_RTORRENT_USER
+			;;
+		2)
+			SET_WEB_USER
+			;;
+		3)
+			SELECT_PLUGINS
+			;;
+		0)
+			APT_DEPENDENCIES
+			INSTALL_RTORRENT
+#			INSTALL_RUTORRENT
+#			CONFIGURE_APACHE
+			INSTALL_SYSTEMD_SERVICE
+			START_RTORRENT
+			INSTALL_COMPLETE
+			break
+			;;
+		q)
+			break
+			;;
+	esac
+done
