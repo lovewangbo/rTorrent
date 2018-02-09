@@ -205,11 +205,11 @@ function INSTALL_COMPLETE {
 CHECK_ROOT
 LICENSE
 HEADER
-SET_RTORRENT_USER
+#SET_RTORRENT_USER
 
 # NOTICE: Change lib, rtorrent, rutorrent versions on upgrades.
 while true; do
-	HEADER
+#	HEADER
 	echo " ${BOLD}rTorrent version:${NORMAL} ${RED}0.9.4${NORMAL}"
 	echo " ${BOLD}libTorrent version:${NORMAL} ${RED}0.13.4${NORMAL}"
 	echo " ${BOLD}ruTorrent version:${NORMAL} ${RED}3.6${NORMAL}"
@@ -235,15 +235,15 @@ while true; do
 
 	case "$case" in
 		1)
-			SET_RTORRENT_USER
+#			SET_RTORRENT_USER
 			;;
 		0)
 			APT_DEPENDENCIES
 			INSTALL_RTORRENT
 #			INSTALL_RUTORRENT
 #			CONFIGURE_APACHE
-			INSTALL_SYSTEMD_SERVICE
-			START_RTORRENT
+#			INSTALL_SYSTEMD_SERVICE
+#			START_RTORRENT
 			INSTALL_COMPLETE
 			break
 			;;
