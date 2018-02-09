@@ -73,32 +73,6 @@ function SET_RTORRENT_USER {
 	done
 }
 
-# Function to  create users for the webinterface
-function SET_WEB_USER {
-	while true; do
-		echo -n "Please type the username for the webinterface, system user not required: "
-		read WEB_USER
-		USER=$(htpasswd -n $WEB_USER 2>/dev/null)
-		if [ $? = 0 ]; then
-			WEB_USER_ARRAY+=($USER)
-			break
-		else
-			echo
-			echo "${RED}Something went wrong!"
-			echo "You have entered an unusable username and/or different passwords.${NORMAL}"
-			echo
-		fi
-	done
-}
-
-# Function to list WebUI users in the menu
-function LIST_WEB_USERS {
-	for i in ${WEB_USER_ARRAY[@]}; do
-		USER_CUT=$(echo $i | cut -d \: -f 1)
-		echo -n " $USER_CUT"
-	done
-}
-
 # Header for the menu
 function HEADER {
 	read -p " Press any key to continue..." -n 1
@@ -133,8 +107,6 @@ function INSTALL_RTORRENT {
 	sudo make install
 	make clean
 
-	sudo apt-get update
-	./configure --with-xmlrpc-c --enable-ipv6
 	cd ..
 	git clone https://github.com/rakshasa/libtorrent.git
 	cd libtorrent
