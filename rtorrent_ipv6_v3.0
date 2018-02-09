@@ -240,12 +240,6 @@ while true; do
 		1)
 			SET_RTORRENT_USER
 			;;
-		2)
-			SET_WEB_USER
-			;;
-		3)
-			SELECT_PLUGINS
-			;;
 		0)
 			APT_DEPENDENCIES
 			INSTALL_RTORRENT
