@@ -96,7 +96,8 @@ function APT_DEPENDENCIES {
 # Function for setting up xmlrpc, libtorrent and rtorrent
 function INSTALL_RTORRENT {
 	# Use the temp folder for compiling
-	cd ~/tmp
+	mkdir tmp
+	cd tmp
 
 	curl -L http://sourceforge.net/projects/xmlrpc-c/files/Xmlrpc-c%20Super%20Stable/1.33.18/xmlrpc-c-1.33.18.tgz/download -o xmlrpc-c.tgz
 	tar zxvf xmlrpc-c.tgz
