@@ -208,7 +208,6 @@ CHECK_ROOT
 LICENSE
 HEADER
 SET_RTORRENT_USER
-SET_WEB_USER
 
 # NOTICE: Change lib, rtorrent, rutorrent versions on upgrades.
 while true; do
