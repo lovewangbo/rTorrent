@@ -219,11 +219,11 @@ while true; do
 	echo " ${BOLD}rTorrent user:${NORMAL}${GREEN} $RTORRENT_USER${NORMAL}"
 	echo
 	echo -n " ${BOLD}ruTorrent user(s):${NORMAL}${GREEN}"
-	LIST_WEB_USERS
+#	LIST_WEB_USERS
 	echo
 	echo
 	echo " ${NORMAL}${BOLD}ruTorrent plugins:${NORMAL}${GREEN}"
-	LIST_PLUGINS
+#	LIST_PLUGINS
 	echo
 	echo " ${NORMAL}[1] - Change rTorrent user"
 	echo " [2] - Add another ruTorrent user"
